@@ -1,5 +1,6 @@
 package de.komoot.photon;
 
+import de.komoot.photon.gtfs.GtfsSearchStops;
 import de.komoot.photon.query.BadRequestException;
 import de.komoot.photon.query.ReverseRequest;
 import de.komoot.photon.query.ReverseRequestFactory;
@@ -42,6 +43,11 @@ public class ReverseSearchRequestHandler extends RouteImpl {
         }
 
         List<PhotonResult> results = requestHandler.reverse(photonRequest);
+
+        // Search in stops from gtfs file
+        if (GtfsSearchStops.isAbleToSearch()) {
+            results = GtfsSearchStops.searchByLatLon(results, photonRequest);
+        }
 
         // Restrict to the requested limit.
         if (results.size() > photonRequest.getLimit()) {

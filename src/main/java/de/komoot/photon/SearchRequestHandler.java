@@ -1,5 +1,6 @@
 package de.komoot.photon;
 
+import de.komoot.photon.gtfs.GtfsSearchStops;
 import de.komoot.photon.query.BadRequestException;
 import de.komoot.photon.query.PhotonRequest;
 import de.komoot.photon.query.PhotonRequestFactory;
@@ -47,6 +48,14 @@ public class SearchRequestHandler extends RouteImpl {
         // Restrict to the requested limit.
         if (results.size() > photonRequest.getLimit()) {
             results = results.subList(0, photonRequest.getLimit());
+        }
+
+        // Search in stops from gtfs file
+        if (GtfsSearchStops.isAbleToSearch()) {
+            results = GtfsSearchStops.search(results, photonRequest);
+            if (results.size() > photonRequest.getLimit()) {
+                results = results.subList(0, photonRequest.getLimit());
+            }
         }
 
         String debugInfo = null;
